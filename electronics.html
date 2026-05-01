@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electronics & Home Appliances - Sri Prasannanjaneya Home Needs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo" style="font-size: 20px;">
+                <span class="logo-highlight">Sri Prasannanjaneya</span> Home Needs
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Back to Home</a></li>
+            </ul>
+            <div class="hamburger">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero" style="background-image: url('images/electronics.png'); background-position: center;">
+        <div class="hero-overlay"></div>
+        <div class="container hero-content">
+            <h1 class="reveal">Home Appliances</h1>
+            <p class="reveal delay-1">Upgrade your home with our premium range of top-tier electronics and appliances.</p>
+        </div>
+    </header>
+
+    <!-- Appliances Items Section -->
+    <section class="section bg-light">
+        <div class="container">
+            <div class="section-title reveal">
+                <h2>Explore Categories</h2>
+                <p>Select a category below to view our exclusive products.</p>
+            </div>
+            <div class="grid">
+                <!-- Sub-pages based on homepage structure -->
+                <a href="ac-coolers.html" class="card reveal" style="text-decoration: none; display: block; color: inherit;">
+                    <div class="card-body" style="text-align: center; padding: 50px;">
+                        <i class="fas fa-snowflake" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+                        <h3>Air Conditioners & Coolers</h3>
+                    </div>
+                </a>
+                <a href="washing-tv.html" class="card reveal delay-1" style="text-decoration: none; display: block; color: inherit;">
+                    <div class="card-body" style="text-align: center; padding: 50px;">
+                        <i class="fas fa-tv" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+                        <h3>Washing Machines & LED TVs</h3>
+                    </div>
+                </a>
+                <a href="fridge-geyser.html" class="card reveal" style="text-decoration: none; display: block; color: inherit;">
+                    <div class="card-body" style="text-align: center; padding: 50px;">
+                        <i class="fas fa-temperature-low" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+                        <h3>Refrigerators & Geysers</h3>
+                    </div>
+                </a>
+                <a href="small-appliances.html" class="card reveal delay-1" style="text-decoration: none; display: block; color: inherit;">
+                    <div class="card-body" style="text-align: center; padding: 50px;">
+                        <i class="fas fa-fire-burner" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+                        <h3>Rice Cookers & Induction</h3>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; <span id="year"></span> Sri Prasannanjaneya Home Needs. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
