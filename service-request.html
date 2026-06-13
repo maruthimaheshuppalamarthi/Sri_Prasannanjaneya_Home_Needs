@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raise Service Request - Sri Prasannanjaneya Home Needs</title>
+    <meta name="description" content="Raise a product installation or service complaint request for your electronics and home appliances. Fast and professional service.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Core Style -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Service Request Page Styles -->
+    <link rel="stylesheet" href="css/service-request.css?v=1.2">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Supabase JS Client SDK CDN -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="service-request.html" class="logo" style="font-size: 20px;">
+                <span class="logo-highlight">Sri Prasannanjaneya</span> Home Needs
+            </a>
+            <ul class="nav-links">
+                <li><a href="service-request.html" class="nav-active">Service Request</a></li>
+                <li><a href="track-ticket.html">Track Ticket</a></li>
+            </ul>
+            <div class="hamburger">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Service Request Section -->
+    <section class="request-section">
+        <div class="container">
+            
+            <!-- Form Card -->
+            <div class="request-card" id="requestCard">
+                <div class="card-header">
+                    <h2>Raise Service Request</h2>
+                    <p>Provide the details below. Our customer support team will review and contact you shortly.</p>
+                </div>
+
+                <form id="serviceRequestForm" novalidate>
+                    
+                    <!-- Customer Details Section -->
+                    <div class="form-section-title">
+                        <i class="fas fa-user-tag"></i>
+                        <span>Customer Details</span>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <!-- Customer Name -->
+                        <div class="form-group">
+                            <label for="customerName">Customer Name <span class="required">*</span></label>
+                            <input type="text" id="customerName" name="customerName" class="input-control" placeholder="Enter your full name" required>
+                            <div class="error-msg" id="customerNameError"></div>
+                        </div>
+
+                        <!-- Mobile Number -->
+                        <div class="form-group">
+                            <label for="mobileNumber">Mobile Number <span class="required">*</span></label>
+                            <input type="tel" id="mobileNumber" name="mobileNumber" class="input-control" placeholder="10-digit mobile number" maxlength="10" required>
+                            <div class="error-msg" id="mobileNumberError"></div>
+                        </div>
+
+                        <!-- Email Address -->
+                        <div class="form-group">
+                            <label for="emailAddress">Email Address <span class="required">*</span></label>
+                            <input type="email" id="emailAddress" name="emailAddress" class="input-control" placeholder="e.g. name@example.com" required>
+                            <div class="error-msg" id="emailAddressError"></div>
+                        </div>
+
+                        <!-- Preferred Contact Method -->
+                        <div class="form-group">
+                            <label>Preferred Contact Method</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" id="contactMobile" name="preferredContact" value="Mobile Call" checked>
+                                    <span>Mobile Call</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" id="contactEmail" name="preferredContact" value="Email">
+                                    <span>Email</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Service Address -->
+                        <div class="form-group full-width">
+                            <label for="serviceAddress">Service / Installation Address <span class="required">*</span></label>
+                            <textarea id="serviceAddress" name="serviceAddress" class="input-control" placeholder="Enter complete address including house number, village/city, and landmark" required style="min-height: 90px;"></textarea>
+                            <div class="error-msg" id="serviceAddressError"></div>
+                        </div>
+                    </div>
+
+                    <!-- Purchase Details Section -->
+                    <div class="form-section-title">
+                        <i class="fas fa-receipt"></i>
+                        <span>Purchase Details</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <!-- Invoice Number -->
+                        <div class="form-group">
+                            <label for="invoiceNumber">Invoice Number <span class="required">*</span></label>
+                            <input type="text" id="invoiceNumber" name="invoiceNumber" class="input-control" placeholder="Enter invoice number" required>
+                            <div class="error-msg" id="invoiceNumberError"></div>
+                        </div>
+
+                        <!-- Invoice Date -->
+                        <div class="form-group">
+                            <label for="invoiceDate">Invoice Date <span class="required">*</span></label>
+                            <input type="date" id="invoiceDate" name="invoiceDate" class="input-control" required>
+                            <div class="error-msg" id="invoiceDateError"></div>
+                        </div>
+
+                        <!-- Upload Invoice Image -->
+                        <div class="form-group full-width">
+                            <label>Upload Invoice Image <span class="required">*</span></label>
+                            <div class="file-upload-wrapper">
+                                <div class="file-upload-box" id="fileUploadBox">
+                                    <i class="fas fa-cloud-upload-alt" id="uploadIcon"></i>
+                                    <p id="uploadText">Drag & drop or click to upload invoice</p>
+                                    <p style="font-size: 0.75rem; margin-top: 4px;">Accepted formats: JPG, JPEG, PNG, PDF | Maximum size: 10 MB</p>
+                                    
+                                    <div class="file-name-display" id="fileNameDisplay">
+                                        <i class="fas fa-file-invoice" style="font-size: 1rem; margin-bottom: 0; margin-right: 0;"></i>
+                                        <span class="file-name-text" id="fileNameText">invoice.jpg</span>
+                                        <button type="button" class="remove-file-btn" id="removeFileBtn" title="Remove file">
+                                            <i class="fas fa-times-circle" style="font-size: 1rem; margin: 0; color: inherit;"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <input type="file" id="invoiceImage" name="invoiceImage" accept=".jpg,.jpeg,.png,.pdf" required>
+                                </div>
+                            </div>
+                            <div class="error-msg" id="invoiceImageError"></div>
+                        </div>
+                    </div>
+
+                    <!-- Product Section -->
+                    <div class="form-section-title">
+                        <i class="fas fa-tv"></i>
+                        <span>Product Information</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <!-- Product Category Dropdown -->
+                        <div class="form-group">
+                            <label for="productCategory">Product Category <span class="required">*</span></label>
+                            <select id="productCategory" name="productCategory" class="input-control" required>
+                                <option value="" disabled selected>Select Category</option>
+                            </select>
+                            <div class="error-msg" id="productCategoryError"></div>
+                        </div>
+
+                        <!-- Product Category textbox (Hidden by default) -->
+                        <div class="form-group hidden-field" id="otherCategoryGroup">
+                            <label for="enterProductCategory">Enter Product Category <span class="required">*</span></label>
+                            <input type="text" id="enterProductCategory" name="enterProductCategory" class="input-control" placeholder="Please specify category name">
+                            <div class="error-msg" id="enterProductCategoryError"></div>
+                        </div>
+
+                        <!-- Brand Dropdown -->
+                        <div class="form-group">
+                            <label for="brand">Brand <span class="required">*</span></label>
+                            <select id="brand" name="brand" class="input-control" required>
+                                <option value="" disabled selected>Select Brand</option>
+                            </select>
+                            <div class="error-msg" id="brandError"></div>
+                        </div>
+
+                        <!-- Brand textbox (Hidden by default) -->
+                        <div class="form-group hidden-field" id="otherBrandGroup">
+                            <label for="enterBrandName">Enter Brand Name <span class="required">*</span></label>
+                            <input type="text" id="enterBrandName" name="enterBrandName" class="input-control" placeholder="Please specify brand name">
+                            <div class="error-msg" id="enterBrandNameError"></div>
+                        </div>
+
+                        <!-- Purchased From Dropdown -->
+                        <div class="form-group">
+                            <label for="purchasedFrom">Purchased From <span class="required">*</span></label>
+                            <select id="purchasedFrom" name="purchasedFrom" class="input-control" required>
+                                <option value="" disabled selected>Select store</option>
+                                <option value="Sri Prasannanjaneya Home Needs">Sri Prasannanjaneya Home Needs</option>
+                                <option value="Other Store">Other Store</option>
+                            </select>
+                            <div class="error-msg" id="purchasedFromError"></div>
+                        </div>
+
+                        <!-- Store Name input (Hidden by default) -->
+                        <div class="form-group hidden-field" id="storeNameGroup">
+                            <label for="storeName">Store Name <span class="required">*</span></label>
+                            <input type="text" id="storeName" name="storeName" class="input-control" placeholder="Please specify store name">
+                            <div class="error-msg" id="storeNameError"></div>
+                        </div>
+
+                        <!-- Model Number -->
+                        <div class="form-group">
+                            <label for="modelNumber">Product Model Number <span class="required">*</span></label>
+                            <input type="text" id="modelNumber" name="modelNumber" class="input-control" placeholder="e.g. UA43A7000" required>
+                            <div class="error-msg" id="modelNumberError"></div>
+                        </div>
+
+                        <!-- Serial Number (Optional) -->
+                        <div class="form-group">
+                            <label for="serialNumber">Product Serial Number <span class="optional">(Optional)</span></label>
+                            <input type="text" id="serialNumber" name="serialNumber" class="input-control" placeholder="e.g. 1234567890ABC">
+                            <div class="error-msg" id="serialNumberError"></div>
+                        </div>
+
+                        <!-- Request Type -->
+                        <div class="form-group full-width">
+                            <label for="requestType">Request Type <span class="required">*</span></label>
+                            <select id="requestType" name="requestType" class="input-control" required>
+                                <option value="" disabled selected>Select Request Type</option>
+                                <option value="Demo and Installation">Demo and Installation</option>
+                                <option value="Service and Complaint">Service and Complaint</option>
+                            </select>
+                            <div class="error-msg" id="requestTypeError"></div>
+                        </div>
+                    </div>
+
+                    <!-- Request Details Section -->
+                    <div class="form-section-title">
+                        <i class="fas fa-tools"></i>
+                        <span>Request Details</span>
+                    </div>
+ 
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="issueDescription">Additional Details <span class="required" id="issueDescriptionRequired">*</span></label>
+                            <textarea id="issueDescription" name="issueDescription" class="input-control" placeholder="Please describe the issue in detail" required></textarea>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div class="error-msg" id="issueDescriptionError" style="margin-top: 5px;"></div>
+                                <div class="char-counter" id="charCounter">0 / 20 minimum characters</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                        <button type="reset" id="resetBtn" class="btn btn-secondary">Reset Form</button>
+                        <button type="submit" id="submitRequestBtn" class="btn btn-primary">
+                            <span class="spinner" id="submitSpinner" style="display: none;"></span>
+                            <span id="submitBtnText">Submit Request</span>
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Success Card -->
+            <div class="success-card" id="successCard">
+                <div class="success-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h3>Service Request Submitted Successfully</h3>
+                
+                <div class="success-ticket-id">
+                    Ticket Number:<br>
+                    <span id="successTicketId"></span>
+                </div>
+                <div class="success-status" style="margin-top: 10px; font-size: 0.95rem; color: var(--text-muted);">
+                    Status: <strong id="successStatus" style="color: #2ecc71;">Open</strong>
+                </div>
+
+                <p>Our team will review your request and contact you shortly.</p>
+                <div style="display: flex; gap: 15px; width: 100%; justify-content: center; margin-top: 10px;">
+                    <button type="button" id="fileAnotherBtn" class="btn btn-secondary">Submit Another Request</button>
+                </div>
+
+            </div>
+
+            <!-- Email Notification Info Card (shown alongside success card) -->
+            <div class="email-notify-card" id="emailNotifyCard">
+
+                <div class="email-notify-important">
+                    <p class="email-notify-important-title">
+                        <i class="fas fa-triangle-exclamation"></i> Important
+                    </p>
+                    <p>Please check your <strong>Spam / Junk</strong> folder if you do not see the email in your Inbox.</p>
+                    <p style="margin-top: 8px;">
+                        To ensure you receive all future updates, add
+                        <a href="mailto:sriprasannanjaneyahomeneeds16@gmail.com" class="email-notify-link">sriprasannanjaneyahomeneeds16@gmail.com</a>
+                        to your safe senders / contact list.
+                    </p>
+                </div>
+
+                <div class="email-notify-timeline">
+                    <i class="fas fa-clock"></i>
+                    <span>Service requests are typically completed within <strong>4 – 7 working days</strong>. Our team will contact you to schedule a convenient time.</span>
+                </div>
+
+                <div class="email-notify-footer">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <span>You can also track your request anytime using your Ticket Number on the
+                    <a href="track-ticket.html" class="email-notify-link">Track Ticket</a> page.</span>
+                </div>
+
+            </div>
+
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; <span id="year"></span> Sri Prasannanjaneya Home Needs. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Shared Logic Script -->
+    <script src="js/script.js"></script>
+    <!-- Page Specific Script -->
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <!-- EmailJS Credentials -->
+    <script src="js/emailjs-config.js"></script>
+    <!-- Email Service -->
+    <script src="js/email-service.js"></script>
+    <!-- Service Request Script -->
+    <script src="js/service-request.js"></script>
+</body>
+
+</html>

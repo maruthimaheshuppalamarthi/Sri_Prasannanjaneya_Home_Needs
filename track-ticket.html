@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Service Request – Sri Prasannanjaneya Home Needs</title>
+    <meta name="description" content="Track your service request status using your Ticket Number and Mobile Number. Sri Prasannanjaneya Home Needs.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Core Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Page Styles -->
+    <link rel="stylesheet" href="css/track-ticket.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Supabase SDK -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+    <!-- ========== NAVBAR ========== -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="service-request.html" class="logo" style="font-size: 20px;">
+                <span class="logo-highlight">Sri Prasannanjaneya</span> Home Needs
+            </a>
+            <ul class="nav-links">
+                <li><a href="service-request.html">Service Request</a></li>
+                <li><a href="track-ticket.html" class="nav-active">Track Ticket</a></li>
+            </ul>
+            <div class="hamburger">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ========== TRACK SECTION ========== -->
+    <section class="track-section">
+        <div class="container">
+
+            <!-- Page Header -->
+            <div class="track-header">
+                <div class="track-icon-wrap">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h1>Track Service Request</h1>
+                <p>Enter your Ticket Number and Mobile Number to check the status of your service request.</p>
+            </div>
+
+            <!-- Search Card -->
+            <div class="search-card" id="searchCard">
+                <form id="trackForm" novalidate>
+                    <div class="track-form-grid">
+
+                        <div class="track-form-group" id="ticketNumGroup">
+                            <label for="ticketNumber">
+                                <i class="fas fa-ticket-alt"></i>
+                                Ticket Number <span class="req">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="ticketNumber"
+                                class="track-input"
+                                placeholder="e.g. SPHN-20260610-143015-431"
+                                autocomplete="off"
+                                required
+                            >
+                            <span class="track-error" id="ticketNumError"></span>
+                        </div>
+
+                        <div class="track-form-group" id="mobileGroup">
+                            <label for="mobileNumber">
+                                <i class="fas fa-mobile-alt"></i>
+                                Mobile Number <span class="req">*</span>
+                            </label>
+                            <input
+                                type="tel"
+                                id="mobileNumber"
+                                class="track-input"
+                                placeholder="Enter 10-digit mobile number"
+                                maxlength="10"
+                                autocomplete="tel"
+                                required
+                            >
+                            <span class="track-error" id="mobileError"></span>
+                        </div>
+
+                    </div>
+
+                    <button type="submit" class="btn-track" id="trackBtn">
+                        <span class="btn-text" id="trackBtnText">
+                            <i class="fas fa-search"></i> Track Status
+                        </span>
+                        <span class="track-spinner" id="trackSpinner"></span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Not Found Message -->
+            <div class="not-found-card" id="notFoundCard" style="display:none;">
+                <div class="not-found-icon"><i class="fas fa-search-minus"></i></div>
+                <h3>No Ticket Found</h3>
+                <p>No ticket found. Please check your Ticket Number and Mobile Number.</p>
+                <button class="btn-try-again" id="tryAgainBtn">
+                    <i class="fas fa-redo"></i> Try Again
+                </button>
+            </div>
+
+            <!-- Result Card -->
+            <div class="result-wrapper" id="resultWrapper" style="display:none;">
+
+                <!-- Ticket Info -->
+                <div class="result-card" id="resultCard">
+
+                    <!-- Result Header -->
+                    <div class="result-card-header">
+                        <div>
+                            <span class="result-ticket-label">Ticket Number</span>
+                            <div class="result-ticket-num" id="rTicketNum">–</div>
+                        </div>
+                        <span class="status-badge-lg" id="rStatusBadge">Open</span>
+                    </div>
+
+                    <!-- Info Grid -->
+                    <div class="result-info-grid">
+
+                        <div class="result-section">
+                            <h3 class="result-section-title">
+                                <i class="fas fa-user"></i> Customer Details
+                            </h3>
+                            <div class="result-row"><span class="rl">Name</span><span class="rv" id="rName">–</span></div>
+                            <div class="result-row"><span class="rl">Mobile</span><span class="rv" id="rMobile">–</span></div>
+                        </div>
+
+                        <div class="result-section">
+                            <h3 class="result-section-title">
+                                <i class="fas fa-box"></i> Product Details
+                            </h3>
+                            <div class="result-row"><span class="rl">Category</span><span class="rv" id="rCategory">–</span></div>
+                            <div class="result-row"><span class="rl">Brand</span><span class="rv" id="rBrand">–</span></div>
+                            <div class="result-row"><span class="rl">Model Number</span><span class="rv" id="rModel">–</span></div>
+                        </div>
+
+                        <div class="result-section">
+                            <h3 class="result-section-title">
+                                <i class="fas fa-tools"></i> Request Details
+                            </h3>
+                            <div class="result-row"><span class="rl">Request Type</span><span class="rv" id="rRequestType">–</span></div>
+                            <div class="result-row"><span class="rl">Submitted On</span><span class="rv" id="rCreatedAt">–</span></div>
+                        </div>
+
+                        <div class="result-section">
+                            <h3 class="result-section-title">
+                                <i class="fas fa-cog"></i> Status Details
+                            </h3>
+                            <div class="result-row"><span class="rl">Status</span><span class="rv" id="rStatusText">–</span></div>
+                            <div class="result-row"><span class="rl">Assigned To</span><span class="rv" id="rAssignedTo">–</span></div>
+                            <div class="result-row" id="rCompletedRow" style="display:none;"><span class="rl">Completed On</span><span class="rv" id="rCompletedAt">–</span></div>
+                        </div>
+
+                    </div>
+
+                    <!-- Invoice Section -->
+                    <div class="invoice-section" id="invoiceSection" style="display:none;">
+                        <h3 class="result-section-title">
+                            <i class="fas fa-receipt"></i> Invoice
+                        </h3>
+                        <div id="invoiceContent"></div>
+                    </div>
+
+                </div>
+
+                <!-- Comments Section -->
+                <div class="comments-card" id="commentsCard">
+                    <h3 class="result-section-title">
+                        <i class="fas fa-comments"></i> Activity &amp; Comments
+                    </h3>
+                    <div class="comments-list" id="commentsList">
+                        <div class="comments-loading">
+                            <div class="mini-spinner"></div>
+                            Loading comments…
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Again -->
+                <div class="search-again-wrap">
+                    <button class="btn-search-again" id="searchAgainBtn">
+                        <i class="fas fa-search"></i> Search Another Ticket
+                    </button>
+                </div>
+
+            </div><!-- /result-wrapper -->
+
+        </div>
+    </section>
+
+    <!-- ========== INVOICE IMAGE FULLSCREEN VIEWER ========== -->
+    <div class="inv-viewer-overlay" id="invViewerOverlay">
+        <div class="inv-viewer-bar">
+            <span class="inv-viewer-hint">
+                <i class="fas fa-search-plus"></i> Scroll to zoom &nbsp;·&nbsp;
+                <i class="fas fa-expand-arrows-alt"></i> Double-click to fit/zoom
+            </span>
+            <button class="inv-viewer-close" id="invViewerClose" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="inv-viewer-stage" id="invViewerStage">
+            <img id="invViewerImg" src="" alt="Invoice preview" draggable="false">
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/script.js"></script>
+    <script src="js/track-ticket.js"></script>
+</body>
+</html>

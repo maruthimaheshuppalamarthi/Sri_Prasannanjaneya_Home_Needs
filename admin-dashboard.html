@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard – Sri Prasannanjaneya Home Needs</title>
+    <meta name="description" content="Admin management dashboard for service tickets.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <!-- Supabase SDK -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <!-- ============================================================ -->
+    <!-- SIDEBAR -->
+    <!-- ============================================================ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-store"></i>
+                <span>SPHN Admin</span>
+            </div>
+            <button class="sidebar-close" id="sidebarClose" aria-label="Close sidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-target="ticketsView">
+                <i class="fas fa-ticket-alt"></i>
+                <span>Tickets</span>
+            </a>
+            <a href="#" class="nav-item" data-target="optionsView">
+                <i class="fas fa-list-ul"></i>
+                <span>Manage Options</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Sidebar overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ============================================================ -->
+    <!-- MAIN CONTENT -->
+    <!-- ============================================================ -->
+    <div class="main-content" id="mainContent">
+
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="page-title">
+                    <h1>Ticket Management</h1>
+                    <p>Sri Prasannanjaneya Home Needs</p>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="admin-badge">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Admin</span>
+                </div>
+                <button class="logout-btn-top" id="logoutBtnTop">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </header>
+
+        <!-- ============================================================ -->
+        <!-- TICKETS VIEW -->
+        <!-- ============================================================ -->
+        <div id="ticketsView">
+
+        <!-- ============================================================ -->
+        <!-- SUMMARY CARDS -->
+        <!-- ============================================================ -->
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card" id="statTotal">
+                    <div class="stat-icon total"><i class="fas fa-ticket-alt"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="countTotal">–</span>
+                        <span class="stat-label">Total Tickets</span>
+                    </div>
+                </div>
+                <div class="stat-card" id="statOpen">
+                    <div class="stat-icon open"><i class="fas fa-folder-open"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="countOpen">–</span>
+                        <span class="stat-label">Open</span>
+                    </div>
+                </div>
+                <div class="stat-card" id="statAssigned">
+                    <div class="stat-icon assigned"><i class="fas fa-user-check"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="countAssigned">–</span>
+                        <span class="stat-label">Assigned</span>
+                    </div>
+                </div>
+                <div class="stat-card" id="statCompleted">
+                    <div class="stat-icon completed"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="countCompleted">–</span>
+                        <span class="stat-label">Completed</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- CONTROLS: Search + Filter -->
+        <!-- ============================================================ -->
+        <section class="controls-section">
+            <div class="controls-row">
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input
+                        type="text"
+                        id="searchInput"
+                        class="search-input"
+                        placeholder="Search by ticket #, mobile, or customer name…"
+                    >
+                    <button class="clear-search" id="clearSearch" style="display:none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="filter-group">
+                    <button class="filter-btn active" data-status="all">All</button>
+                    <button class="filter-btn" data-status="Open">Open</button>
+                    <button class="filter-btn" data-status="Assigned">Assigned</button>
+                    <button class="filter-btn" data-status="Completed">Completed</button>
+                </div>
+                <button class="refresh-btn" id="refreshBtn" title="Refresh data">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- TICKET TABLE -->
+        <!-- ============================================================ -->
+        <section class="table-section">
+            <div class="table-header">
+                <span class="table-count" id="tableCount">Loading tickets…</span>
+            </div>
+            <div class="table-wrapper">
+                <table class="ticket-table" id="ticketTable">
+                    <thead>
+                        <tr>
+                            <th>Ticket #</th>
+                            <th>Customer</th>
+                            <th>Mobile</th>
+                            <th>Category</th>
+                            <th>Brand</th>
+                            <th>Request Type</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ticketTableBody">
+                        <tr>
+                            <td colspan="9" class="loading-row">
+                                <div class="loading-spinner"></div>
+                                Loading tickets…
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        </div> <!-- End of Tickets View -->
+
+        <!-- ============================================================ -->
+        <!-- OPTIONS MANAGEMENT VIEW (Hidden by default) -->
+        <!-- ============================================================ -->
+        <div id="optionsView" style="display: none;">
+            <section class="options-section">
+                
+                <!-- Categories Management Panel -->
+                <div class="options-card">
+                    <div class="options-header">
+                        <h2><i class="fas fa-tags"></i> Product Categories</h2>
+                        <p>Manage the categories available in the service request form.</p>
+                    </div>
+                    
+                    <div class="options-add-row">
+                        <input type="text" id="newCategoryInput" placeholder="New Category Name..." class="options-input">
+                        <button class="btn-add-option" id="addCategoryBtn">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                    <span class="options-error" id="categoryError"></span>
+
+                    <div class="options-list-wrapper">
+                        <ul class="options-list" id="categoryList">
+                            <li class="options-loading"><div class="mini-spinner"></div> Loading categories...</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Brands Management Panel -->
+                <div class="options-card">
+                    <div class="options-header">
+                        <h2><i class="fas fa-building"></i> Brands</h2>
+                        <p>Manage the product brands available in the service request form.</p>
+                    </div>
+                    
+                    <div class="options-add-row">
+                        <input type="text" id="newBrandInput" placeholder="New Brand Name..." class="options-input">
+                        <button class="btn-add-option" id="addBrandBtn">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                    <span class="options-error" id="brandError"></span>
+
+                    <div class="options-list-wrapper">
+                        <ul class="options-list" id="brandList">
+                            <li class="options-loading"><div class="mini-spinner"></div> Loading brands...</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </section>
+        </div> <!-- End of Options View -->
+
+    </div> <!-- End main-content --><!-- /main-content -->
+
+
+    <!-- ============================================================ -->
+    <!-- TICKET DETAIL MODAL -->
+    <!-- ============================================================ -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="ticketModal">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title" id="modalTicketNum">Ticket Details</h2>
+                    <span class="modal-created" id="modalCreatedAt"></span>
+                </div>
+                <button class="modal-close" id="modalClose" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="modal-grid">
+
+                    <!-- LEFT COLUMN -->
+                    <div class="modal-col">
+
+                        <!-- Customer Info -->
+                        <div class="modal-section">
+                            <h3 class="modal-section-title">
+                                <i class="fas fa-user"></i> Customer Information
+                            </h3>
+                            <div class="info-row"><span class="info-label">Name</span><span class="info-value" id="mCustomerName">–</span></div>
+                            <div class="info-row"><span class="info-label">Mobile</span><span class="info-value" id="mMobile">–</span></div>
+                            <div class="info-row"><span class="info-label">Email</span><span class="info-value" id="mEmail">–</span></div>
+                            <div class="info-row"><span class="info-label">Contact Pref.</span><span class="info-value" id="mContactPref">–</span></div>
+                            <div class="info-row"><span class="info-label">Service Address</span><span class="info-value" id="mServiceAddress">–</span></div>
+                        </div>
+
+                        <!-- Product Info -->
+                        <div class="modal-section">
+                            <h3 class="modal-section-title">
+                                <i class="fas fa-box"></i> Product Information
+                            </h3>
+                            <div class="info-row"><span class="info-label">Category</span><span class="info-value" id="mCategory">–</span></div>
+                            <div class="info-row"><span class="info-label">Brand</span><span class="info-value" id="mBrand">–</span></div>
+                            <div class="info-row"><span class="info-label">Model Number</span><span class="info-value" id="mModel">–</span></div>
+                            <div class="info-row"><span class="info-label">Serial Number</span><span class="info-value" id="mSerial">–</span></div>
+                        </div>
+
+                        <!-- Purchase Info -->
+                        <div class="modal-section">
+                            <h3 class="modal-section-title">
+                                <i class="fas fa-receipt"></i> Purchase Information
+                            </h3>
+                            <div class="info-row"><span class="info-label">Invoice #</span><span class="info-value" id="mInvoiceNum">–</span></div>
+                            <div class="info-row"><span class="info-label">Invoice Date</span><span class="info-value" id="mInvoiceDate">–</span></div>
+                            <div class="info-row"><span class="info-label">Purchased From</span><span class="info-value" id="mPurchasedFrom">–</span></div>
+                            <div class="info-row" id="mStoreRow" style="display:none;"><span class="info-label">Store Name</span><span class="info-value" id="mStoreName">–</span></div>
+
+                            <!-- Invoice Preview -->
+                            <div class="invoice-preview-area" id="invoicePreviewArea">
+                                <span class="info-label">Invoice Image</span>
+                                <div class="invoice-preview-box" id="invoicePreviewBox">
+                                    <div class="preview-loading" id="previewLoading">
+                                        <div class="loading-spinner small"></div>
+                                        Loading invoice…
+                                    </div>
+                                    <img id="invoiceImg" src="" alt="Invoice" style="display:none;">
+                                    <a id="invoicePdfLink" href="#" target="_blank" class="pdf-link" style="display:none;">
+                                        <i class="fas fa-file-pdf"></i> View PDF Invoice
+                                    </a>
+                                    <p id="invoiceNoPreview" style="display:none; color: var(--text-muted); font-size:0.85rem;">
+                                        Preview unavailable
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Request Info -->
+                        <div class="modal-section">
+                            <h3 class="modal-section-title">
+                                <i class="fas fa-tools"></i> Request Information
+                            </h3>
+                            <div class="info-row"><span class="info-label">Request Type</span><span class="info-value" id="mRequestType">–</span></div>
+                            <div class="info-row"><span class="info-label">Additional Details</span><span class="info-value" id="mIssueDesc">–</span></div>
+                        </div>
+
+                    </div><!-- /left col -->
+
+                    <!-- RIGHT COLUMN -->
+                    <div class="modal-col">
+
+                        <!-- Unified Management Section -->
+                        <div class="modal-section management-section">
+                            <h3 class="modal-section-title">
+                                <i class="fas fa-cog"></i> Manage Ticket
+                            </h3>
+
+                            <div class="manage-group">
+                                <label for="statusSelect">Status</label>
+                                <select id="statusSelect" class="manage-select">
+                                    <option value="Open">Open</option>
+                                    <option value="Assigned">Assigned</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                            </div>
+
+                            <div class="manage-group">
+                                <label for="assignedToInput">Assigned To</label>
+                                <input
+                                    type="text"
+                                    id="assignedToInput"
+                                    class="manage-input"
+                                    placeholder="e.g. Ramesh, Suresh, Mahesh"
+                                    list="technicianList"
+                                >
+                                <datalist id="technicianList">
+                                    <option value="Ramesh">
+                                    <option value="Suresh">
+                                    <option value="Mahesh">
+                                </datalist>
+                            </div>
+
+                            <!-- Divider -->
+                            <div class="manage-divider"></div>
+
+                            <div class="manage-group">
+                                <label for="commentText">Comment <span style="color:var(--text-muted); font-weight:400;">(optional)</span></label>
+                                <textarea
+                                    id="commentText"
+                                    class="manage-textarea"
+                                    placeholder="Write your comment…"
+                                    rows="3"
+                                ></textarea>
+                            </div>
+
+                            <div class="manage-group">
+                                <label for="commentAddedBy">Added By</label>
+                                <input
+                                    type="text"
+                                    id="commentAddedBy"
+                                    class="manage-input"
+                                    placeholder="Enter your name"
+                                >
+                            </div>
+
+                            <button class="btn-update" id="updateTicketBtn">
+                                <span id="updateBtnText">Update Ticket</span>
+                                <span class="btn-spinner" id="updateSpinner"></span>
+                            </button>
+                            <div class="update-feedback" id="updateFeedback"></div>
+                        </div>
+
+                        <!-- Comments History (read-only) -->
+                        <div class="modal-section">
+                            <h3 class="modal-section-title">
+                                <i class="fas fa-comments"></i> Comment History
+                            </h3>
+                            <div class="comments-list" id="commentsList">
+                                <div class="loading-row small">
+                                    <div class="loading-spinner small"></div>
+                                    Loading comments…
+                                </div>
+                            </div>
+                        </div>
+
+                    </div><!-- /right col -->
+
+
+                </div><!-- /modal-grid -->
+            </div><!-- /modal-body -->
+        </div><!-- /modal -->
+    </div><!-- /modal-overlay -->
+
+    <!-- ============================================================ -->
+    <!-- FULLSCREEN IMAGE VIEWER -->
+    <!-- ============================================================ -->
+    <div class="img-viewer-overlay" id="imgViewerOverlay">
+        <div class="img-viewer-topbar">
+            <span class="img-viewer-hint">
+                <i class="fas fa-search-plus"></i> Scroll to zoom &nbsp;·&nbsp;
+                <i class="fas fa-expand-arrows-alt"></i> Double-click to toggle fit/zoom
+            </span>
+            <button class="img-viewer-close" id="imgViewerClose" aria-label="Close viewer">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="img-viewer-stage" id="imgViewerStage">
+            <img id="imgViewerImage" src="" alt="Invoice fullscreen view" draggable="false">
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <!-- EmailJS Credentials -->
+    <script src="js/emailjs-config.js"></script>
+    <script src="js/email-service.js"></script>
+    <script src="js/admin-dashboard.js"></script>
+</body>
+</html>
